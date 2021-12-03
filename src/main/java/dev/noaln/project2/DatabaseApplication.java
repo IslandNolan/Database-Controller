@@ -25,7 +25,7 @@ public class DatabaseApplication extends Application {
     }
 
     public static void main(String[] args) throws SQLException, MalformedURLException {
-       Connection con = DriverManager.getConnection("jdbc:mariadb://10.253.126.96/db","root","jyzma0");
+       Connection con = DriverManager.getConnection("https://cisvm-winsrv-mysql1.unfcsd.unf.edu:3307","n01440422","Fall20210422");
 
 
 
