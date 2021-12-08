@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.sql.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class DatabaseApplication extends Application {
@@ -31,6 +33,18 @@ public class DatabaseApplication extends Application {
 
 
 
+
+
+    @FXML
+    private ArrayList<String> queryHistory = new ArrayList<>();
+    @FXML
+    private TextField commandQuery;
+    @FXML
+    private Text actionCount;
+    @FXML
+    private Button applyQueries;
+    @FXML
+    private Button discardQueries;
     @FXML
     private Button loginButton;
     @FXML
@@ -47,7 +61,6 @@ public class DatabaseApplication extends Application {
     @Override
     public void start(Stage s) throws IOException {
 
-
         FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseLogin.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 640, 480);
         stage=s;
@@ -59,6 +72,18 @@ public class DatabaseApplication extends Application {
     public static void main(String[] args) throws SQLException, MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         launch();
+    }
+    @FXML
+    public void addToExecutionList(ActionEvent actionEvent){
+        if(commandQuery.getText().isBlank()){
+            commandQuery.setPromptText("Error, input is blank!");
+            return;
+        }
+        String str = commandQuery.getText();
+        commandQuery.clear();
+        queryHistory.add(str);
+        actionCount.setText("Actions Pending Execution "+queryHistory.size());
+        commandQuery.setPromptText("Added SQL Query to pending list!");
     }
 
     @FXML
@@ -90,7 +115,14 @@ public class DatabaseApplication extends Application {
         }
 
     }
+    @FXML
+    public void onApplyQueriesClicked(ActionEvent actionEvent){
 
+    }
+    @FXML
+    public void onDiscardQueriesClicked(ActionEvent actionEvent){
+
+    }
     @FXML
     public void onContextMenuRequested(ContextMenuEvent contextMenuEvent) {
     }
