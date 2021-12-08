@@ -25,9 +25,11 @@ import java.io.IOException;
 
 
 public class DatabaseApplication extends Application {
-    //private static String connection = "jdbc:mysql://cisvm-winsrv-mysql1.unfcsd.unf.edu:3307/team2";
-    //private static String username="N01440422";
-    //private static String pass = "Fall20210422";
+    private static String connection = "jdbc:mysql://cisvm-winsrv-mysql1.unfcsd.unf.edu:3307/team2";
+    private static String usernames="N01440422";
+    private static String pass = "Fall20210422";
+
+
 
     @FXML
     private Button loginButton;
@@ -38,18 +40,20 @@ public class DatabaseApplication extends Application {
     @FXML
     private TextField password;
 
-
+    static Stage stage = null;
     static Connection con=null;
 
 
     @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseControllerFX.fxml"));
+    public void start(Stage s) throws IOException {
+
+
+        FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseLogin.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+        stage=s;
         stage.setTitle("SQL Controller");
         stage.setScene(scene);
         stage.show();
-
     }
 
     public static void main(String[] args) throws SQLException, MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -60,18 +64,34 @@ public class DatabaseApplication extends Application {
     @FXML
     public void onLoginButtonClicked(ActionEvent actionEvent) {
         try{
-
-            con = DriverManager.getConnection(address.getText(), username.getText(), password.getText());
+            con = DriverManager.getConnection(connection, usernames, pass);
             System.out.println("Connected to Database: [" + con.getCatalog() + "]");
-
-            //We should launch the "Edit" view from this point because we have a good connection.
         }
         catch (Exception E){
             System.out.println("Something went wrong, Please try again! ");
         }
 
+
+        //This will launch assuming everything is working properly.
+        enterConnectedMode();
+    }
+    public void enterConnectedMode() {
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseConnectedPage.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(),640,480);
+            stage.hide();
+            stage.setScene(scene);
+            stage.show();
+
+        }
+        catch (Exception E){
+            System.out.println("Something went wrong! ");
+
+        }
+
     }
 
+    @FXML
     public void onContextMenuRequested(ContextMenuEvent contextMenuEvent) {
     }
 }
