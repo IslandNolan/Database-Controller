@@ -52,11 +52,11 @@ public class DatabaseApplication extends Application {
     @FXML
     private TextField password;
     @FXML
-    private Text connectedTo;
+    private Text connectedTo = new Text();
 
 
     static Stage stage = null;
-    static Connection con=null;
+    static Connection con = null;
 
 
     @Override
@@ -76,6 +76,7 @@ public class DatabaseApplication extends Application {
     }
     @FXML
     public void addToExecutionList(ActionEvent actionEvent){
+        updateUsingDatabase();
         if(commandQuery.getText().isBlank()){
             commandQuery.setPromptText("Error, input is blank!");
             return;
@@ -89,12 +90,24 @@ public class DatabaseApplication extends Application {
         updateActionCount();
         commandQuery.setPromptText("Added SQL Query to pending list!");
     }
+    public void updateUsingDatabase(){
+        try{
+            connectedTo.setText("Using Database: "+con.getCatalog());
+        }
+        catch (SQLException E){
+            E.printStackTrace();
+        }
+    }
     public void updateActionCount(){
         actionCount.setText("Actions Pending Execution: "+queryHistory.size());
     }
     @FXML
     public void dropSelectedEntry(){
         Entry E = executionPane.getSelectionModel().getSelectedItem();
+        if(E==null){
+            System.out.println("No Statement Selected to Drop, Please add one and try again.");
+            return;
+        }
         executionPane.getItems().remove(E);
         queryHistory.remove(E);
         updateActionCount();
@@ -104,6 +117,10 @@ public class DatabaseApplication extends Application {
     @FXML
     public void executeSelectedEntry(){
         Entry E = executionPane.getSelectionModel().getSelectedItem();
+        if(E==null){
+            System.out.println("No Statement Selected to Execute, Please add one and try again.");
+            return;
+        }
         Boolean b = execute(E);
         if(b){
             executionPane.getItems().remove(E); //if succeeds then remove
@@ -117,7 +134,9 @@ public class DatabaseApplication extends Application {
         try{
             Statement s = con.createStatement();
             s.execute(E.query);
+            System.out.println("THIS WILL BE DISPLAYED VIA A POP-UP ON APPLICABLE QUERIES ON A LATER VERSION OF THIS CONTROLLER");
             System.out.println("Result Set: " + s.getResultSet());
+
             return true;
         }
         catch(SQLException e){
@@ -149,23 +168,25 @@ public class DatabaseApplication extends Application {
             stage.hide();
             stage.setScene(scene);
             stage.show();
-            updateUsingDatabase();
+
         }
         catch (Exception E){
+            E.printStackTrace();
             System.out.println("Something went wrong! ");
 
         }
     }
-    public void updateUsingDatabase() throws SQLException {
-        connectedTo.setText("Using Database: "+con.getCatalog());
-    }
+
     @FXML
     public void onApplyQueriesClicked(ActionEvent actionEvent){
-
+        if(queryHistory.size()==0){
+            System.out.println("No Statements to Execute..");
+            return;
+        }
         Iterator<Entry> itr = queryHistory.iterator();
         while(itr.hasNext()){
             Entry E = itr.next();
-            System.out.println("Success: ["+execute(E)+ "] for Statement: "+E.query);
+            System.out.println("["+execute(E)+ "] ---> "+E.query);
             executionPane.getItems().remove(E);
             itr.remove();
         }
@@ -173,6 +194,10 @@ public class DatabaseApplication extends Application {
     }
     @FXML
     public void onDiscardQueriesClicked(ActionEvent actionEvent){
+        if(queryHistory.size()==0){
+            System.out.println("No Statements to Drop..");
+            return;
+        }
         queryHistory.clear();
         executionPane.getItems().clear();
         updateActionCount();

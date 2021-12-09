@@ -19,7 +19,7 @@
         <Text layoutX="75.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="List of Actions Pending Execution" />
         <Button layoutX="171.0" layoutY="448.0" mnemonicParsing="false" onAction="#dropSelectedEntry" text="Drop Selected Query" />
         <Button layoutX="304.0" layoutY="448.0" mnemonicParsing="false" onAction="#executeSelectedEntry" text="Execute Selected Query" />
-        <Text fx:id="connectedTo" layoutX="75.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Using Database: team2" wrappingWidth="139.978515625" />
+        <Text fx:id="connectedTo" layoutX="75.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Using Database: " wrappingWidth="268.978515625" />
         <Button id="applyQueries" layoutX="14.0" layoutY="448.0" mnemonicParsing="false" onAction="#onApplyQueriesClicked" text="Apply All" />
         <Button id="discardQueries" layoutX="90.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDiscardQueriesClicked" text="Discard All" />
         <Button layoutX="551.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDisconnect" text="Disconnect" />
