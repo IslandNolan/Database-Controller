@@ -6,21 +6,20 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.noaln.project2.DatabaseApplication">
   <children>
-    <TextField layoutX="259.0" layoutY="149.0" promptText="jdbc:mysql://&lt;address&gt;/database/" />
-    <Text layoutX="152.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Server Address" />
-    <Text layoutX="161.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Connect to a Database" wrappingWidth="318.1953125">
+    <TextField fx:id="address" layoutX="213.0" layoutY="148.0" prefHeight="25.0" prefWidth="241.0" promptText="jdbc:mysql://&lt;address&gt;/database/" text="jdbc:mysql://cisvm-winsrv-mysql1.unfcsd.unf.edu:3307/team2" />
+    <Text layoutX="116.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Server Address" />
+    <Text layoutX="133.0" layoutY="102.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Connect to a Database" textAlignment="CENTER" wrappingWidth="374.1953125">
       <font>
-        <Font size="24.0" />
+        <Font size="35.0" />
       </font>
     </Text>
-    <Text layoutX="9.0" layoutY="463.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Group 2 Database Controller Project: Nolan, Elizabeth, Parthi, CJ." wrappingWidth="470.296875" />
-    <Text layoutX="181.0" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
-    <TextField layoutX="259.0" layoutY="188.0" />
-    <Text layoutX="183.0" layoutY="242.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" />
-    <TextField layoutX="259.0" layoutY="225.0" />
-    <Button fx:id="loginButton" layoutX="269.0" layoutY="265.0" mnemonicParsing="false" onAction="#onLoginButtonClicked" onContextMenuRequested="#onContextMenuRequested" text="Login" />
+    <Text layoutX="139.0" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
+    <TextField fx:id="username" layoutX="213.0" layoutY="188.0" prefHeight="25.0" prefWidth="241.0" promptText="NXXXXXXXX" text="N01440422" />
+    <Text layoutX="141.0" layoutY="242.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" />
+    <TextField fx:id="password" layoutX="213.0" layoutY="225.0" prefHeight="25.0" prefWidth="241.0" promptText="Can't help you with this, Sorry!" />
+    <Button fx:id="loginButton" layoutX="263.0" layoutY="266.0" mnemonicParsing="false" onAction="#onLoginButtonClicked" onContextMenuRequested="#onContextMenuRequested" prefHeight="25.0" prefWidth="115.0" text="Login" />
+    <Button layoutX="558.0" layoutY="446.0" mnemonicParsing="false" onAction="#onResetLoginClicked" text="Reset GUI" />
   </children>
 </Pane>

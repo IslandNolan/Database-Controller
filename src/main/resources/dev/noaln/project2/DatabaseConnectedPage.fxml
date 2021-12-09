@@ -2,25 +2,26 @@
 
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Text?>
 
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dev.noaln.project2.DatabaseApplication">
     <children>
-        <ToolBar layoutY="440.0" prefHeight="40.0" prefWidth="223.0">
-            <items>
-                <Button id="applyQueries" mnemonicParsing="false" text="Apply Changes" />
-                <Button id="discardQueries" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" text="Discard Changes" />
-            </items>
-        </ToolBar>
         <Accordion layoutY="350.0" />
-        <TextField id="commandQuery" fx:id="commandQuery" layoutX="90.0" layoutY="36.0" prefHeight="25.0" prefWidth="420.0" />
-        <Text layoutX="51.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Query:" wrappingWidth="39.0" />
-        <Button layoutX="90.0" layoutY="69.0" mnemonicParsing="false" onAction="#addToExecutionList" prefHeight="25.0" prefWidth="420.0" text="Add to Execution List" />
-        <Text layoutX="90.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add a command to be sent to the SQL Server. " wrappingWidth="420.0" />
-        <Text fx:id="actionCount" layoutX="440.0" layoutY="465.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Actions Pending Execution: " wrappingWidth="185.13671875" />
+        <TextField id="commandQuery" fx:id="commandQuery" layoutX="75.0" layoutY="36.0" prefHeight="25.0" prefWidth="491.0" />
+        <Text layoutX="36.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Query:" wrappingWidth="39.0" />
+        <Button layoutX="75.0" layoutY="69.0" mnemonicParsing="false" onAction="#addToExecutionList" prefHeight="25.0" prefWidth="491.0" text="Add to Execution List" />
+        <Text layoutX="75.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add a command to be sent to the SQL Server. " wrappingWidth="420.0" />
+        <Text fx:id="actionCount" layoutX="403.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Actions Pending Execution:  0" wrappingWidth="168.13671875" />
+        <ListView fx:id="executionPane" layoutX="75.0" layoutY="142.0" prefHeight="209.0" prefWidth="491.0" />
+        <Text layoutX="75.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="List of Actions Pending Execution" />
+        <Button layoutX="171.0" layoutY="448.0" mnemonicParsing="false" onAction="#dropSelectedEntry" text="Drop Selected Query" />
+        <Button layoutX="304.0" layoutY="448.0" mnemonicParsing="false" onAction="#executeSelectedEntry" text="Execute Selected Query" />
+        <Text fx:id="connectedTo" layoutX="75.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Using Database: team2" wrappingWidth="139.978515625" />
+        <Button id="applyQueries" layoutX="14.0" layoutY="448.0" mnemonicParsing="false" onAction="#onApplyQueriesClicked" text="Apply All" />
+        <Button id="discardQueries" layoutX="90.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDiscardQueriesClicked" text="Discard All" />
+        <Button layoutX="551.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDisconnect" text="Disconnect" />
     </children>
 </Pane>
