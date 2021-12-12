@@ -9,10 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -25,8 +22,8 @@ import java.net.URL;
 import java.sql.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.sql.Date;
+import java.util.*;
 
 
 public class DatabaseApplication extends Application {
@@ -36,6 +33,8 @@ public class DatabaseApplication extends Application {
     private static String pass = "Fall20210422";
 
 
+
+    private ArrayList<Transaction> thistory = new ArrayList<>();
     private ArrayList<ResultSet> rs = new ArrayList<>();
     @FXML
     private ListView<Entry> executionPane;
@@ -116,27 +115,31 @@ public class DatabaseApplication extends Application {
     }
     @FXML
     public void executeSelectedEntry(){
-        Entry E = executionPane.getSelectionModel().getSelectedItem();
-        if(E==null){
+
+        ObservableList<Entry> selectedStatements = executionPane.getSelectionModel().getSelectedItems();
+        if(selectedStatements.size()==0){
             System.out.println("No Statement Selected to Execute, Please add one and try again.");
             return;
         }
-        Boolean b = execute(E);
-        if(b){
-            executionPane.getItems().remove(E); //if succeeds then remove
-            queryHistory.remove(E);
-            queryHistory.trimToSize();
-            System.out.println("Successfully Executed Query: "+E.query);
-        }
+        selectedStatements.forEach(e -> {
+            Boolean b = execute(e);
+            if(b){
+                executionPane.getItems().remove(e); //if succeeds then remove
+                queryHistory.remove(e);
+                queryHistory.trimToSize();
+                System.out.println("Successfully Executed Query: "+e.query);
+            }
+        });
         updateActionCount();
     }
     private boolean execute(Entry E){
         try{
+
+            createTransactionIfVoid();
             Statement s = con.createStatement();
             s.execute(E.query);
             System.out.println("THIS WILL BE DISPLAYED VIA A POP-UP ON APPLICABLE QUERIES ON A LATER VERSION OF THIS CONTROLLER");
             System.out.println("Result Set: " + s.getResultSet());
-
             return true;
         }
         catch(SQLException e){
@@ -147,17 +150,20 @@ public class DatabaseApplication extends Application {
 
     @FXML
     public void onLoginButtonClicked(ActionEvent actionEvent) {
+
+        address.setText("jdbc:mysql://localhost/team2");
+        username.setText("Nolan");
+        password.setText("jyzma0");
         try{
             con = DriverManager.getConnection(address.getText(), username.getText(), password.getText());
-            System.out.println("Connected to Database: [" + con.getCatalog() + "]");
+            System.out.println("Connected to Database: ["+con.getCatalog()+" @ "+con.getMetaData().getURL()+"]");
         }
         catch (Exception E){
             E.printStackTrace();
             System.out.println("Something went wrong, Please try again! ");
             return;
         }
-
-        //This will launch assuming everything is working properly.
+        //This will launch if everything is working properly.
         enterConnectedMode();
     }
     public void enterConnectedMode() {
@@ -233,11 +239,46 @@ public class DatabaseApplication extends Application {
             System.out.println("Unable to Reset- An Error has occurred");
         }
     }
+    public void createTransactionIfVoid(){
+        try{
+            System.out.print("--Triggered Transaction Table Check-- ");
+            if(!tableExists("Transaction")){ //Ensure that the Table "Transaction" Exists.
+                Statement smt = con.createStatement();
+                con.beginRequest();
+                smt.executeUpdate("CREATE TABLE Transaction (\n" +
+                        "\tID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,\n" +
+                        "    Sch VARCHAR(100),\n" +
+                        "    Db VARCHAR(100),\n" +
+                        "    Usr VARCHAR(100),\n" +
+                        "    Dt Date NOT NULL,\n" +
+                        "    Command VARCHAR(200),\n" +
+                        "    Ip VARCHAR(16),\n" +
+                        "    OS VARCHAR(20)\n" +
+                        ");");
+            }
+        }
+        catch(Exception ignored){ System.out.println("Failed to create Table: Transaction.. ");}
 
-    @FXML
-    public void onContextMenuRequested(ContextMenuEvent contextMenuEvent) {
     }
-    class Entry {
+    public boolean tableExists(String tableName){
+        try{
+
+            ResultSet r = con.createStatement().executeQuery("SHOW TABLES;");
+            HashSet<String> temp = new HashSet<>();
+            while (r.next()) {
+                for (int i = 1; i <= r.getMetaData().getColumnCount(); i++) {
+                    temp.add(r.getString(i));
+                }
+            }
+            return temp.contains(tableName.toLowerCase(Locale.ROOT));
+        }
+        catch (Exception E){
+            System.out.println("[Critical] An error has occurred while fetching list of tables");
+            return false;
+
+        }
+    }
+    class Entry { //Two inner classes.
         String query;
         Integer index;
         String errorMessage=null;
@@ -250,6 +291,27 @@ public class DatabaseApplication extends Application {
         }
         public void setErrorMessage(String s){
             this.errorMessage=s;
+        }
+    }
+    class Transaction {
+        String schema;
+        String database;
+        String user;
+        Date date;
+        String query;
+        String ipAddress;
+        String operatingSystem;
+
+
+        public Transaction(String schema,String database,String user,String query){
+            this.schema = schema;
+            this.database = database;
+            this.user = user;
+            this.query = query;
+
+        }
+        public String toString(){ //Simple toString
+            return " | "+date.toString()+" | "+user+" | "+query+" | ";
         }
     }
 }

@@ -19,7 +19,7 @@
     <TextField fx:id="username" layoutX="213.0" layoutY="188.0" prefHeight="25.0" prefWidth="241.0" promptText="NXXXXXXXX" text="N01440422" />
     <Text layoutX="141.0" layoutY="242.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" />
     <TextField fx:id="password" layoutX="213.0" layoutY="225.0" prefHeight="25.0" prefWidth="241.0" promptText="Can't help you with this, Sorry!" />
-    <Button fx:id="loginButton" layoutX="263.0" layoutY="266.0" mnemonicParsing="false" onAction="#onLoginButtonClicked" onContextMenuRequested="#onContextMenuRequested" prefHeight="25.0" prefWidth="115.0" text="Login" />
+    <Button fx:id="loginButton" layoutX="263.0" layoutY="266.0" mnemonicParsing="false" onAction="#onLoginButtonClicked" prefHeight="25.0" prefWidth="115.0" text="Login" />
     <Button layoutX="558.0" layoutY="446.0" mnemonicParsing="false" onAction="#onResetLoginClicked" text="Reset GUI" />
   </children>
 </Pane>
