@@ -1,30 +1,44 @@
 package dev.noaln.project2;
 
 import javafx.application.Application;
+import javafx.application.Preloader;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.scene.control.*;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
-import javafx.stage.Stage;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.util.Callback;
 
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.util.Callback;
+
+import javax.xml.transform.Result;
+import java.net.MalformedURLException;
 import java.sql.*;
 
 import java.io.IOException;
 import java.sql.Date;
 import java.util.*;
-
 
 public class DatabaseApplication extends Application {
 
@@ -32,9 +46,6 @@ public class DatabaseApplication extends Application {
     private static String usernames="N01440422";
     private static String pass = "Fall20210422";
 
-
-
-    private ArrayList<Transaction> thistory = new ArrayList<>();
     private ArrayList<ResultSet> rs = new ArrayList<>();
     @FXML
     private ListView<Entry> executionPane;
@@ -51,18 +62,17 @@ public class DatabaseApplication extends Application {
     @FXML
     private TextField password;
     @FXML
-    private Text connectedTo = new Text();
-
+    private Text connectedTo;
 
     static Stage stage = null;
     static Connection con = null;
-
 
     @Override
     public void start(Stage s) throws IOException {
 
         FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseLogin.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+
         stage=s;
         stage.setTitle("SQL Controller [Group 2: Nolan, CJ, Elizabeth, Parthi]");
         stage.setScene(scene);
@@ -137,12 +147,12 @@ public class DatabaseApplication extends Application {
 
             createTransactionIfVoid();
             Statement s = con.createStatement();
-            s.execute(E.query);
-            System.out.println("THIS WILL BE DISPLAYED VIA A POP-UP ON APPLICABLE QUERIES ON A LATER VERSION OF THIS CONTROLLER");
-            System.out.println("Result Set: " + s.getResultSet());
+            if(s.execute(E.query)){ }
+            printResultSet(E,s.getResultSet());
             return true;
         }
         catch(SQLException e){
+            e.printStackTrace();
             System.out.println("An error has occurred while processing Statement: "+E.query);
             return false;
         }
@@ -171,7 +181,6 @@ public class DatabaseApplication extends Application {
 
             FXMLLoader fxmlLoader = new FXMLLoader(DatabaseApplication.class.getResource("DatabaseConnectedPage.fxml"));
             Scene scene = new Scene(fxmlLoader.load(),640,480);
-            stage.hide();
             stage.setScene(scene);
             stage.show();
 
@@ -182,7 +191,6 @@ public class DatabaseApplication extends Application {
 
         }
     }
-
     @FXML
     public void onApplyQueriesClicked(ActionEvent actionEvent){
         if(queryHistory.size()==0){
@@ -239,22 +247,24 @@ public class DatabaseApplication extends Application {
             System.out.println("Unable to Reset- An Error has occurred");
         }
     }
+    public void printResultSet(Entry entry,ResultSet rs){
+        try{
+            Stage temp = new Stage();
+            ResultSetTableView r = new ResultSetTableView(rs);
+            temp.setScene(new Scene(r));
+            temp.setTitle(entry.toString());
+
+            temp.show();
+        }
+        catch (Exception E){}
+
+    }
     public void createTransactionIfVoid(){
         try{
-            System.out.print("--Triggered Transaction Table Check-- ");
             if(!tableExists("Transaction")){ //Ensure that the Table "Transaction" Exists.
                 Statement smt = con.createStatement();
                 con.beginRequest();
-                smt.executeUpdate("CREATE TABLE Transaction (\n" +
-                        "\tID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,\n" +
-                        "    Sch VARCHAR(100),\n" +
-                        "    Db VARCHAR(100),\n" +
-                        "    Usr VARCHAR(100),\n" +
-                        "    Dt Date NOT NULL,\n" +
-                        "    Command VARCHAR(200),\n" +
-                        "    Ip VARCHAR(16),\n" +
-                        "    OS VARCHAR(20)\n" +
-                        ");");
+                smt.executeUpdate("CREATE TABLE Transaction ( Id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, Success CHAR(5), User VARCHAR(100), Date Date NOT NULL, Query VARCHAR(200),IP_Address VARCHAR(16),Operating_System VARCHAR(20));");
             }
         }
         catch(Exception ignored){ System.out.println("Failed to create Table: Transaction.. ");}
@@ -312,6 +322,50 @@ public class DatabaseApplication extends Application {
         }
         public String toString(){ //Simple toString
             return " | "+date.toString()+" | "+user+" | "+query+" | ";
+        }
+    }
+
+
+    class ResultSetTableView extends TableView {
+
+        private ResultSet resultSet;
+
+        private List<String> columnNames = new ArrayList<>();
+
+        public ResultSetTableView(ResultSet resultSet) throws SQLException {
+            super();
+            this.resultSet = resultSet;
+            buildData();
+        }
+        private void buildData() throws SQLException {
+            ObservableList<ObservableList> data = FXCollections.observableArrayList();
+            for (int i = 0; i < resultSet.getMetaData().getColumnCount(); i++) {
+
+                final int j = i;
+                TableColumn col = new TableColumn(resultSet.getMetaData().getColumnName(i + 1));
+                col.setPrefWidth(resultSet.getMetaData().getColumnName(i+1).length()*15);
+                col.setCellValueFactory((Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> {
+                    if (param.getValue().get(j) != null) {
+                        return new SimpleStringProperty(param.getValue().get(j).toString());
+                    } else {
+                        return null;
+                    }
+                });
+                getColumns().addAll(col);
+                this.columnNames.add(col.getText());
+            }
+            while (resultSet.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+
+                    row.add(resultSet.getString(i));
+                }
+                data.add(row);
+            }
+            setItems(data);
+        }
+        public List<String> getColumnNames() {
+            return columnNames;
         }
     }
 }
