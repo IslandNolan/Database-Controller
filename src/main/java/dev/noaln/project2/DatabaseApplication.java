@@ -161,9 +161,9 @@ public class DatabaseApplication extends Application {
     @FXML
     public void onLoginButtonClicked(ActionEvent actionEvent) {
 
-        address.setText("jdbc:mysql://localhost/team2");
-        username.setText("Nolan");
-        password.setText("jyzma0");
+        //address.setText("jdbc:mysql://localhost/team2");
+        //username.setText("Nolan");
+        //password.setText("jyzma0");
         try{
             con = DriverManager.getConnection(address.getText(), username.getText(), password.getText());
             System.out.println("Connected to Database: ["+con.getCatalog()+" @ "+con.getMetaData().getURL()+"]");
