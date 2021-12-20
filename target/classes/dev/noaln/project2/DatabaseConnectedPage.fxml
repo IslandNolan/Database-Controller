@@ -14,14 +14,14 @@
         <Text layoutX="36.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Query:" wrappingWidth="39.0" />
         <Button layoutX="75.0" layoutY="69.0" mnemonicParsing="false" onAction="#addToExecutionList" prefHeight="25.0" prefWidth="491.0" text="Add to Execution List" />
         <Text layoutX="75.0" layoutY="107.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add a command to be sent to the SQL Server. " wrappingWidth="420.0" />
-        <Text fx:id="actionCount" layoutX="403.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Actions Pending Execution:  0" wrappingWidth="168.13671875" />
+        <Text fx:id="actionCount" layoutX="75.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="" wrappingWidth="168.13671875" />
         <ListView fx:id="executionPane" layoutX="75.0" layoutY="142.0" prefHeight="209.0" prefWidth="491.0" />
-        <Text layoutX="75.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" text="List of Actions Pending Execution" />
         <Button layoutX="171.0" layoutY="448.0" mnemonicParsing="false" onAction="#dropSelectedEntry" text="Drop Selected Query" />
         <Button layoutX="304.0" layoutY="448.0" mnemonicParsing="false" onAction="#executeSelectedEntry" text="Execute Selected Query" />
         <Text fx:id="connectedTo" layoutX="75.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Using Database: " wrappingWidth="268.978515625" />
         <Button id="applyQueries" layoutX="14.0" layoutY="448.0" mnemonicParsing="false" onAction="#onApplyQueriesClicked" text="Apply All" />
         <Button id="discardQueries" layoutX="90.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDiscardQueriesClicked" text="Discard All" />
         <Button layoutX="551.0" layoutY="448.0" mnemonicParsing="false" onAction="#onDisconnect" text="Disconnect" />
+        <Text fx:id="actionExecutionMessage" layoutX="390.0" layoutY="364.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="RIGHT" wrappingWidth="175.41796875" />
     </children>
 </Pane>

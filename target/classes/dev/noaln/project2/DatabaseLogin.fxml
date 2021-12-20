@@ -21,5 +21,6 @@
     <TextField fx:id="password" layoutX="213.0" layoutY="225.0" prefHeight="25.0" prefWidth="241.0" promptText="Can't help you with this, Sorry!" />
     <Button fx:id="loginButton" layoutX="263.0" layoutY="266.0" mnemonicParsing="false" onAction="#onLoginButtonClicked" prefHeight="25.0" prefWidth="115.0" text="Login" />
     <Button layoutX="558.0" layoutY="446.0" mnemonicParsing="false" onAction="#onResetLoginClicked" text="Reset GUI" />
+    <Text fx:id="loginStatus" layoutX="18.0" layoutY="463.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter the connection info to continue... " wrappingWidth="294.13671875" />
   </children>
 </Pane>
