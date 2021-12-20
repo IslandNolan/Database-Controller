@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,6 +25,7 @@ import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -63,6 +65,10 @@ public class DatabaseApplication extends Application {
     private TextField password;
     @FXML
     private Text connectedTo;
+    @FXML
+    private Text loginStatus;
+    @FXML
+    private Text actionExecutionMessage;
 
     static Stage stage = null;
     static Connection con = null;
@@ -103,9 +109,7 @@ public class DatabaseApplication extends Application {
         try{
             connectedTo.setText("Using Database: "+con.getCatalog());
         }
-        catch (SQLException E){
-            E.printStackTrace();
-        }
+        catch (SQLException ignored){}
     }
     public void updateActionCount(){
         actionCount.setText("Actions Pending Execution: "+queryHistory.size());
@@ -115,13 +119,17 @@ public class DatabaseApplication extends Application {
         Entry E = executionPane.getSelectionModel().getSelectedItem();
         if(E==null){
             System.out.println("No Statement Selected to Drop, Please add one and try again.");
+            actionExecutionMessage.setText("Nothing is selected!");
+            actionExecutionMessage.setFill(Paint.valueOf("red"));
             return;
         }
+        actionExecutionMessage.setText("Removed Query");
         executionPane.getItems().remove(E);
         queryHistory.remove(E);
         updateActionCount();
         queryHistory.trimToSize();
         System.out.println("Dropped Selected Statement: "+E.query);
+        actionExecutionMessage.setText("Dropped Selected Query");
     }
     @FXML
     public void executeSelectedEntry(){
@@ -129,8 +137,11 @@ public class DatabaseApplication extends Application {
         ObservableList<Entry> selectedStatements = executionPane.getSelectionModel().getSelectedItems();
         if(selectedStatements.size()==0){
             System.out.println("No Statement Selected to Execute, Please add one and try again.");
+            actionExecutionMessage.setText("Nothing is Selected!");
+            actionExecutionMessage.setFill(Paint.valueOf("red"));
             return;
         }
+
         selectedStatements.forEach(e -> {
             Boolean b = execute(e);
             if(b){
@@ -138,13 +149,14 @@ public class DatabaseApplication extends Application {
                 queryHistory.remove(e);
                 queryHistory.trimToSize();
                 System.out.println("Successfully Executed Query: "+e.query);
+                actionExecutionMessage.setText("Applied Selected Action..");
             }
         });
+
         updateActionCount();
     }
     private boolean execute(Entry E){
         try{
-
             createTransactionIfVoid();
             Statement s = con.createStatement();
             if(s.execute(E.query)){ }
@@ -152,7 +164,6 @@ public class DatabaseApplication extends Application {
             return true;
         }
         catch(SQLException e){
-            e.printStackTrace();
             System.out.println("An error has occurred while processing Statement: "+E.query);
             return false;
         }
@@ -161,19 +172,18 @@ public class DatabaseApplication extends Application {
     @FXML
     public void onLoginButtonClicked(ActionEvent actionEvent) {
 
-        //address.setText("jdbc:mysql://localhost/team2");
-        //username.setText("Nolan");
-        //password.setText("jyzma0");
+        address.setText("jdbc:mysql://localhost/team2");
+        username.setText("Nolan");
+        password.setText("jyzma0");
         try{
             con = DriverManager.getConnection(address.getText(), username.getText(), password.getText());
             System.out.println("Connected to Database: ["+con.getCatalog()+" @ "+con.getMetaData().getURL()+"]");
         }
-        catch (Exception E){
-            E.printStackTrace();
-            System.out.println("Something went wrong, Please try again! ");
+        catch (SQLException E){
+            loginStatus.setText("Incorrect Connection Info!");
+            loginStatus.setFill(Paint.valueOf("red"));
             return;
         }
-        //This will launch if everything is working properly.
         enterConnectedMode();
     }
     public void enterConnectedMode() {
@@ -185,36 +195,39 @@ public class DatabaseApplication extends Application {
             stage.show();
 
         }
-        catch (Exception E){
-            E.printStackTrace();
-            System.out.println("Something went wrong! ");
-
-        }
+        catch (Exception ignored){}
     }
     @FXML
     public void onApplyQueriesClicked(ActionEvent actionEvent){
+        int temp = queryHistory.size();
         if(queryHistory.size()==0){
             System.out.println("No Statements to Execute..");
+            actionExecutionMessage.setText("No Statements to Execute");
+            actionExecutionMessage.setFill(Paint.valueOf("red"));
             return;
         }
         Iterator<Entry> itr = queryHistory.iterator();
         while(itr.hasNext()){
             Entry E = itr.next();
-            System.out.println("["+execute(E)+ "] ---> "+E.query);
-            executionPane.getItems().remove(E);
-            itr.remove();
+            Boolean success = execute(E);
+            System.out.println("["+success+"] ---> "+E.query);
+            if(success){ executionPane.getItems().remove(E); itr.remove(); }
         }
         updateActionCount();
+        actionExecutionMessage.setText(temp-queryHistory.size() + " Actions Applied");
     }
     @FXML
     public void onDiscardQueriesClicked(ActionEvent actionEvent){
         if(queryHistory.size()==0){
             System.out.println("No Statements to Drop..");
+            actionExecutionMessage.setText("Nothing is Selected!");
+            actionExecutionMessage.setFill(Paint.valueOf("red"));
             return;
         }
         queryHistory.clear();
         executionPane.getItems().clear();
         updateActionCount();
+        actionExecutionMessage.setText("Dropped Queries");
     }
     @FXML
     public void onResetLoginClicked(){
@@ -242,10 +255,7 @@ public class DatabaseApplication extends Application {
             start(stage);
             System.gc();
         }
-        catch  (Exception E){
-            E.printStackTrace();
-            System.out.println("Unable to Reset- An Error has occurred");
-        }
+        catch  (Exception ignored){}
     }
     public void printResultSet(Entry entry,ResultSet rs){
         try{
@@ -253,10 +263,10 @@ public class DatabaseApplication extends Application {
             ResultSetTableView r = new ResultSetTableView(rs);
             temp.setScene(new Scene(r));
             temp.setTitle(entry.toString());
-
+            temp.setResizable(false);
             temp.show();
         }
-        catch (Exception E){}
+        catch (Exception ignored){}
 
     }
     public void createTransactionIfVoid(){
